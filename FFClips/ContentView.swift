@@ -11,23 +11,6 @@
 
 ********************************************************************************/
 
-//import SwiftUI
-//import PhotosUI
-//
-//struct ContentView: View {
-//    @State var selectedItems: [PhotosPickerItem] = []
-//    var body: some View {
-//        VStack {
-//            Image(systemName: "globe")
-//                .imageScale(.large)
-//                .foregroundStyle(.tint)
-//            Text("Hello, world!")
-//        }
-//        .padding()
-//        PhotosSelector(selectedItems: $selectedItems)
-//    }
-//}
-//
 import PhotosUI
 import SwiftUI
 
