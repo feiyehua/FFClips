@@ -27,14 +27,13 @@ struct MediaItem: Identifiable {
 }
 
 struct MediaPickerView: View {
-    @State var selectedItems: [PhotosPickerItem] = []
+    @State private var selectedItems: [PhotosPickerItem] = []
     @State private var mediaItems = [MediaItem]()
     @State private var showImportMenu = false
     @State private var selectedPicker: PickerType?
     @State private var showPhotoPicker = false
     @State private var showFilerPicker = false
-//    var handlePickedPDF: (URL) -> Void
-    
+
     enum PickerType {
         case photoLibrary, files
     }
@@ -93,11 +92,27 @@ struct MediaPickerView: View {
         .photosPicker(
             isPresented: $showPhotoPicker,
             selection: $selectedItems,
-            matching: .images
+            matching: .images,
         )
+        .onChange(of: selectedItems) {
+            Task {
+                for item in selectedItems {
+                    let data = try await item.loadTransferable(
+                        type: Data.self
+                    )
+                    let uiImage=UIImage(data: data!)
+                    let mediaItem = MediaItem(
+                        thumbnail: uiImage!,
+                        url: nil,
+                        type: .image
+                    )
+                    mediaItems.append(mediaItem)
+                }
+            }
+        }
         .fileImporter(
             isPresented: $showFilerPicker,
-            allowedContentTypes: [.image,.mp3,.video],
+            allowedContentTypes: [.image, .mp3, .video],
             allowsMultipleSelection: true
         ) { result in
             switch result {
@@ -108,7 +123,7 @@ struct MediaPickerView: View {
                     if !gotAccess { return }
                     // access the directory URL
                     // (read templates in the directory, make a bookmark, etc.)
-//                    handlePickedPDF(file)
+                    //                    handlePickedPDF(file)
                     print(file.absoluteString)
                     // release access
                     file.stopAccessingSecurityScopedResource()
