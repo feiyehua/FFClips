@@ -3,6 +3,14 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "mach_msg2_trap:(null)">
+         <PersistentStrings>
+            <PersistentString
+               value = "loc">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "closure #1 in closure #3 in MediaPickerView.body.getter:MediaItem.swift">
          <PersistentStrings>
             <PersistentString
