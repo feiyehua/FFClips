@@ -79,48 +79,45 @@ struct MediaTimelineView: View {
                 ZStack {
                     Rectangle()
                         .fill(.blue)
-                    GeometryReader { proxy in
-                        HStack(spacing: 0) {
-                            ForEach(0..<Int(totalDuration)) { second in
-                                VStack(spacing: 2) {
-                                    Rectangle()
-                                        .frame(
-                                            width: 1,
-                                            height: second % 5 == 0 ? 20 : 10
-                                        )
+                        .frame(width: proxy.size.width)
+                    HStack(spacing: 0) {
+                        ForEach(0..<Int(totalDuration)) { second in
+                            VStack(spacing: 2) {
+                                Rectangle()
+                                    .frame(
+                                        width: 1,
+                                        height: second % 5 == 0 ? 20 : 10
+                                    )
+                                    .foregroundColor(.gray)
+
+                                if second % 5 == 0 {
+                                    Text("\(second)")
+                                        .font(.system(size: 6))
                                         .foregroundColor(.gray)
-
-                                    if second % 5 == 0 {
-                                        Text("\(second)")
-                                            .font(.system(size: 6))
-                                            .foregroundColor(.gray)
-                                    }
                                 }
-                                .frame(
-                                    width: proxy.size.width / totalDuration
-                                        * scale
-                                )
                             }
+                            .frame(width: 10 * scale)
                         }
-                        .frame(alignment: .leading)
-                        .position(x: xloc + totalDuration * 10 * 0.5 * scale)
-                        .gesture(
-                            DragGesture()
-                                .onChanged { value in
-                                    xloc =
-                                        xloc
-                                        + (value.location.x
-                                            - value.startLocation.x) * scale
-                                    if xloc < -totalDuration * 10 * scale {
-                                        xloc = -totalDuration * 10 * scale
-                                    }
-                                    if xloc > 0 {
-                                        xloc = 0
-                                    }
-                                }
-                        )
                     }
-
+                    .position(
+                        x: xloc + totalDuration * 10 * 0.5 * scale + 0.5
+                            * proxy.size.width - 5
+                    )
+                    .gesture(
+                        DragGesture()
+                            .onChanged { value in
+                                xloc =
+                                    xloc
+                                    + (value.location.x
+                                        - value.startLocation.x) * scale
+                                if xloc < -totalDuration * 10 * scale {
+                                    xloc = -totalDuration * 10 * scale
+                                }
+                                if xloc > 0 {
+                                    xloc = 0
+                                }
+                            }
+                    )
                 }
                 .frame(
                     width: totalDuration * 10,

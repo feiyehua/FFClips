@@ -14,10 +14,68 @@
             filePath = "FFClips/MediaTimeLine.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "160"
-            endingLineNumber = "160"
+            startingLineNumber = "157"
+            endingLineNumber = "157"
             landmarkName = "body"
             landmarkType = "24">
+            <Locations>
+               <Location
+                  uuid = "D203F622-C043-4593-885F-BD23C5F4152E - 12b47ca98b072120"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "FFClips.TimelineRuler.scale.getter : CoreGraphics.CGFloat"
+                  moduleName = "FFClips.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/xiong/FFClips/FFClips/MediaTimeLine.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0">
+               </Location>
+               <Location
+                  uuid = "D203F622-C043-4593-885F-BD23C5F4152E - 9e6483f24dcc712c"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "FFClips.TimelineRuler.scale.setter : CoreGraphics.CGFloat"
+                  moduleName = "FFClips.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/xiong/FFClips/FFClips/MediaTimeLine.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0">
+               </Location>
+               <Location
+                  uuid = "D203F622-C043-4593-885F-BD23C5F4152E - 84eeeb009568dadd"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "FFClips.TimelineRuler.scale.modify : CoreGraphics.CGFloat"
+                  moduleName = "FFClips.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/xiong/FFClips/FFClips/MediaTimeLine.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0">
+               </Location>
+               <Location
+                  uuid = "D203F622-C043-4593-885F-BD23C5F4152E - 74334e0d08420d64"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "FFClips.TimelineRuler.$scale.getter : SwiftUI.Binding&lt;CoreGraphics.CGFloat&gt;"
+                  moduleName = "FFClips.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/xiong/FFClips/FFClips/MediaTimeLine.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
