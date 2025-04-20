@@ -19,7 +19,7 @@ import UniformTypeIdentifiers
 struct MediaItem: Identifiable {
     let id = UUID()
     let thumbnail: UIImage
-    let url: URL?
+    let url: URL
     let type: MediaType
 
     enum MediaType {
@@ -123,7 +123,6 @@ struct MediaPickerView: View {
         case photoLibrary, files
     }
 
-    var columns: [GridItem] = Array(repeating: .init(.flexible()), count: 3)
 
     var body: some View {
         NavigationView {
@@ -138,45 +137,26 @@ struct MediaPickerView: View {
                                     .aspectRatio(contentMode: .fit)
                                     .padding()
                             case .video:
-                                if let videoUrl = noneEmptySelectedItem.url {
-                                    VideoPlayer(
-                                        player: AVPlayer(
-                                            url: videoUrl
-                                        )
+                                let videoUrl = noneEmptySelectedItem.url
+                                VideoPlayer(
+                                    player: AVPlayer(
+                                        url: videoUrl
                                     )
-                                }
+                                )
+
                             }
                         } else {
-                            Image(systemName: "questionmark.folder")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .padding()
-                        }
-                    }
-                    .frame(height: proxy.size.height/3)
-                    ScrollView {
-                        LazyVGrid(columns: columns, spacing: 2) {
-                            ForEach(mediaItems) { item in
-                                Image(uiImage: item.thumbnail)
+                            VStack {
+                                Image(systemName: "questionmark.folder")
                                     .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(
-                                        minWidth: 0,
-                                        maxWidth: .infinity,
-                                        minHeight: 0,
-                                        maxHeight: .infinity
-                                    )
-                                    .clipped()
-                                    .aspectRatio(1, contentMode: .fit)
-                                    .overlay(
-                                        item.type == .video
-                                        ? Image(systemName: "play.circle.fill")
-                                            .foregroundColor(.white) : nil
-                                    )
-                                    .onTapGesture(perform: { selectedItem = item })
+                                    .aspectRatio(contentMode: .fit)
+                                    .padding()
+                                Text("Select a image or video to preview")
                             }
                         }
                     }
+                    .frame(height: proxy.size.height / 3)
+                    MediaLibrary(mediaItems:$mediaItems,selectedItem:$selectedItem)
                     .navigationTitle("Media Gallery")
                     .toolbar(content: {
                         ToolbarItem(placement: .topBarLeading) {
@@ -219,7 +199,7 @@ struct MediaPickerView: View {
                                 case .success(let url):
                                     print(url)
                                     loadFromURL(url: url)
-                                    
+
                                 case .failure(_):
                                     print("fail to read media url")
                                 }
