@@ -77,27 +77,40 @@ struct MediaTimelineView: View {
                 .padding()
             GeometryReader { proxy in
                 ZStack {
-                    Rectangle()
-                        .fill(.blue)
-                        .frame(width: proxy.size.width)
-                    HStack(spacing: 0) {
-                        ForEach(0..<Int(totalDuration)) { second in
-                            VStack(spacing: 2) {
-                                Rectangle()
-                                    .frame(
-                                        width: 1,
-                                        height: second % 5 == 0 ? 20 : 10
-                                    )
-                                    .foregroundColor(.gray)
-
-                                if second % 5 == 0 {
-                                    Text("\(second)")
-                                        .font(.system(size: 6))
+                    VStack{
+                        HStack(spacing: 0) {
+                            ForEach(0..<Int(totalDuration)) { second in
+                                VStack(spacing: 2) {
+                                    Rectangle()
+                                        .frame(
+                                            width: 1,
+                                            height: second % 5 == 0 ? 20 : 10
+                                        )
                                         .foregroundColor(.gray)
+                                    
+                                    if second % 5 == 0 {
+                                        Text("\(second)")
+                                            .font(.system(size: 6))
+                                            .foregroundColor(.gray)
+                                    }
+                                }
+                                .frame(width: 10 * scale)
+                            }
+                        }
+                        .padding()
+                        ScrollView(.vertical){
+                            VStack(spacing: 20){
+                                ForEach(clips) { clip in
+                                    //                                Text("hello")
+                                    Rectangle()
+                                        .fill(.blue)
+                                        .frame(width: clip.duration * 10 * scale, height: 10)
+                                        .position(x:clip.position*10*scale+clip.duration * 10 * scale/2+5)
                                 }
                             }
-                            .frame(width: 10 * scale)
                         }
+                        .frame(height:100)
+                        
                     }
                     .position(
                         x: xloc + totalDuration * 10 * 0.5 * scale + 0.5
@@ -106,10 +119,7 @@ struct MediaTimelineView: View {
                     .gesture(
                         DragGesture()
                             .onChanged { value in
-                                xloc =
-                                    xloc
-                                    + (value.location.x
-                                        - value.startLocation.x) * scale
+                                xloc = xloc + (value.location.x - value.startLocation.x) * 0.15 * scale
                                 if xloc < -totalDuration * 10 * scale {
                                     xloc = -totalDuration * 10 * scale
                                 }
@@ -121,71 +131,27 @@ struct MediaTimelineView: View {
                 }
                 .frame(
                     width: totalDuration * 10,
-                    height: proxy.size.height / 3,
+//                    height: proxy.size.height / 3,
                     alignment: .center
                 )
             }
-            // 固定播放头
-            VStack {
-                Rectangle()
-                    .frame(width: playheadWidth, height: timelineHeight + 20)
-                    .foregroundColor(.red)
-                Spacer()
+            ZStack{
+                
+                // 固定播放头
+                VStack {
+                    Rectangle()
+                        .frame(width: playheadWidth, height: timelineHeight + 20)
+                        .foregroundColor(.red)
+                    Spacer()
+                }
             }
         }
         .frame(height: timelineHeight)
         .padding(.horizontal, 20)
-
-        // 控制面板
-        ControlPanel(
-            currentTime: $currentTime,
-            scale: $scale,
-            totalDuration: totalDuration
-        )
     }
 }
 
-// MARK: - 时间刻度组件
-struct TimelineRuler: View {
-    let totalDuration: Double
-    @Binding var scale: CGFloat
-    @Binding var currentTime: Double
 
-    var body: some View {
-        GeometryReader { geometry in
-            HStack(spacing: 0) {
-                ForEach(0..<Int(totalDuration)) { second in
-                    VStack(spacing: 2) {
-                        Rectangle()
-                            .frame(width: 1, height: second % 5 == 0 ? 20 : 10)
-                            .foregroundColor(.gray)
-
-                        if second % 5 == 0 {
-                            Text("\(second)")
-                                .font(.system(size: 8))
-                                .foregroundColor(.gray)
-                        }
-                    }
-                    .frame(width: 50 * scale)
-                }
-            }
-            .gesture(
-                DragGesture()
-                    .onChanged { value in
-                        let delta =
-                            -((value.location.x - value.startLocation.x))
-                            / (scale)
-                        currentTime = max(
-                            0,
-                            min(totalDuration, currentTime + (delta))
-                        )
-                        print(Double(delta))
-                        print(currentTime)
-                    }
-            )
-        }
-    }
-}
 
 // MARK: - 视频片段组件
 struct ClipView: View {
