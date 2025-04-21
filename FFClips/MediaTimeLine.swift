@@ -76,93 +76,93 @@ struct MediaTimelineView: View {
                 .font(.headline)
                 .padding()
                 .frame(height: 50)
-            GeometryReader { proxy in
-                ZStack {
-                    VStack {
-                        HStack(spacing: 0) {
-                            ForEach(0..<Int(totalDuration)) { second in
-                                VStack(spacing: 2) {
-                                    Rectangle()
-                                        .frame(
-                                            width: 1,
-                                            height: second % 5 == 0 ? 20 : 10
-                                        )
-                                        .foregroundColor(.gray)
-
-                                    if second % 5 == 0 {
-                                        Text("\(second)")
-                                            .font(.system(size: 6))
+            ZStack{
+                GeometryReader { proxy in
+                    ZStack {
+                        VStack {
+                            HStack(spacing: 0) {
+                                ForEach(0..<Int(totalDuration)) { second in
+                                    VStack(spacing: 2) {
+                                        Rectangle()
+                                            .frame(
+                                                width: 1,
+                                                height: second % 5 == 0 ? 20 : 10
+                                            )
                                             .foregroundColor(.gray)
+                                        
+                                        if second % 5 == 0 {
+                                            Text("\(second)")
+                                                .font(.system(size: 6))
+                                                .foregroundColor(.gray)
+                                        }
+                                    }
+                                    .frame(width: 10 * scale)
+                                }
+                            }
+                            .padding()
+                            ScrollView(.vertical) {
+                                VStack(spacing: 20) {
+                                    ForEach(clips) { clip in
+                                        //                                Text("hello")
+                                        RoundedRectangle(cornerRadius: 3)
+                                            .fill(.blue)
+                                            .frame(
+                                                width: clip.duration * 10 * scale,
+                                                height: 10
+                                            )
+                                            .position(
+                                                x: clip.position * 10 * scale + clip
+                                                    .duration * 10 * scale / 2 + 5,
+                                                y: 5
+                                            )
                                     }
                                 }
-                                .frame(width: 10 * scale)
                             }
+                            .frame(height: proxy.size.height-50)
+                            
                         }
-                        .padding()
-                        ScrollView(.vertical) {
-                            VStack(spacing: 20) {
-                                ForEach(clips) { clip in
-                                    //                                Text("hello")
-                                    RoundedRectangle(cornerRadius: 3)
-                                        .fill(.blue)
-                                        .frame(
-                                            width: clip.duration * 10 * scale,
-                                            height: 10
-                                        )
-                                        .position(
-                                            x: clip.position * 10 * scale + clip
-                                                .duration * 10 * scale / 2 + 5,
-                                            y: 5
-                                        )
-                                }
-                            }
-                        }
-                        .frame(height: proxy.size.height-50)
-
-                    }
-                    .position(
-                        x: xloc + totalDuration * 10 * 0.5 * scale + 0.5
+                        .position(
+                            x: xloc + totalDuration * 10 * 0.5 * scale + 0.5
                             * proxy.size.width - 5,
-                        y: proxy.size.height
-                    )
-                    .gesture(
-                        DragGesture()
-                            .onChanged { value in
-                                xloc =
+                            y: proxy.size.height/2
+                        )
+                        .gesture(
+                            DragGesture()
+                                .onChanged { value in
+                                    xloc =
                                     xloc
                                     + (value.location.x - value.startLocation.x)
                                     * 0.15 * scale
-                                if xloc < -totalDuration * 10 * scale {
-                                    xloc = -totalDuration * 10 * scale
+                                    if xloc < -totalDuration * 10 * scale {
+                                        xloc = -totalDuration * 10 * scale
+                                    }
+                                    if xloc > 0 {
+                                        xloc = 0
+                                    }
                                 }
-                                if xloc > 0 {
-                                    xloc = 0
-                                }
-                            }
-                    )
-                }
-                .frame(
-                    width: totalDuration * 10,
-                    alignment: .center
-                )
-                
-            }
-            ZStack {
-
-                // 固定播放头
-                VStack {
-                    Rectangle()
-                        .frame(
-                            width: playheadWidth
                         )
-                        .frame(maxHeight: .infinity)
-                        .foregroundColor(.red)
-                    Spacer()
+                    }
+                    .frame(
+                        width: totalDuration * 10,
+                        alignment: .center
+                    )
+                    
+                }
+                ZStack {
+                    // 固定播放头
+                    VStack {
+                        Rectangle()
+                            .frame(
+                                width: playheadWidth
+                            )
+                            .frame(maxHeight: .infinity)
+                            .foregroundColor(.red)
+                        Spacer()
+                    }
                 }
             }
+            
         }
-        //        .frame(height: timelineHeight)
-        //        .padding(.horizontal, 20)
     }
 }
 
@@ -229,5 +229,6 @@ struct Clip: Identifiable {
 struct TimelineView_Previews: PreviewProvider {
     static var previews: some View {
         MediaTimelineView()
+            .frame(height: 200)
     }
 }
