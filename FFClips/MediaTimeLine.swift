@@ -82,8 +82,8 @@ struct MediaTimelineView: View {
     private func timeString(_ time: Double) -> String {
         let minutes = Int(time) / 60
         let seconds = Int(time) % 60
-        let miliseconds=Int(time*1000)-(minutes*60+seconds)*1000
-        return String(format: "%02d:%02d:%03d", minutes, seconds,miliseconds)
+        let miliseconds = Int(time * 1000) - (minutes * 60 + seconds) * 1000
+        return String(format: "%02d:%02d:%03d", minutes, seconds, miliseconds)
     }
 
     var body: some View {
@@ -128,31 +128,12 @@ struct MediaTimelineView: View {
                                     .frame(width: 10 * scale)
                                 }
                             }
-                            .padding()
                             ScrollView(.vertical) {
-                                VStack(spacing: 20) {
-                                    ForEach(importedMediaItems) { item in
-                                        ForEach(item.clips) { clip in
-                                            RoundedRectangle(cornerRadius: 3)
-                                                .fill(.blue)
-                                                .frame(
-                                                    width: clip.duration * 10
-                                                        * scale,
-                                                    height: 10
-                                                )
-                                                .position(
-                                                    x: clip.position * 10
-                                                        * scale + clip
-                                                        .duration * 10 * scale
-                                                        / 2 + 5,
-                                                    y: 5
-                                                )
-                                        }
-
-                                    }
-                                }
+                                MediaTimeLineClips(
+                                    importedMediaItems: $importedMediaItems,
+                                    scale: $scale
+                                )
                             }
-                            .frame(height: proxy.size.height - 50)
 
                         }
                         .position(
@@ -184,21 +165,19 @@ struct MediaTimelineView: View {
                     )
 
                 }
-                ZStack {
-                    // 固定播放头
-                    VStack {
-                        Rectangle()
-                            .frame(
-                                width: playheadWidth
-                            )
-                            .frame(maxHeight: .infinity)
-                            .foregroundColor(.red)
-                        Spacer()
-                    }
-                }
+                // 固定播放头
+//                VStack {
+                    Rectangle()
+                        .frame(
+                            width: playheadWidth
+                        )
+                        .frame(maxHeight: .infinity)
+                        .foregroundColor(.red)
+//                    Spacer()
+//                }
             }
-
         }
+
     }
 }
 
@@ -275,7 +254,72 @@ struct ImportedMediaItem: Identifiable {
 // MARK: - 数据模型
 struct Clip: Identifiable {
     let id = UUID()
+    var isSelected = false
     var position: Double  // 在时间线中的起始时间（秒）
     var start: Double  //在原视频中的起始时间
     var duration: Double  // 持续时间（秒）
 }
+
+struct MediaTimeLineClips: View {
+    @Binding var importedMediaItems: [ImportedMediaItem]
+    @Binding var scale: CGFloat
+    let rounderRectangleCornerSize: CGFloat = 5
+
+    var body: some View {
+        VStack(spacing: 20) {
+            ForEach(
+                importedMediaItems.indices,
+                id: \.self
+            ) { index1 in
+                ForEach(
+                    importedMediaItems[index1].clips
+                        .indices,
+                    id: \.self
+                ) { index2 in
+                    ZStack {
+                        RoundedRectangle(
+                            cornerRadius: rounderRectangleCornerSize
+                        )
+                        .fill(.blue)
+                        .onTapGesture(perform: {
+                            importedMediaItems[index1]
+                                .clips[index2]
+                                .isSelected.toggle()
+                        })
+                        if importedMediaItems[index1].clips[index2].isSelected {
+                            RoundedRectangle(
+                                cornerRadius: rounderRectangleCornerSize
+                            )
+                            .strokeBorder(Color.black, lineWidth: 2)
+
+                        }
+                    }
+                    .frame(
+                        width: importedMediaItems[
+                            index1
+                        ].clips[index2].duration
+                            * 10
+                            * scale,
+                        height: 20
+                    )
+                    .position(
+                        x: importedMediaItems[
+                            index1
+                        ].clips[index2].position
+                            * 10
+                            * scale
+                            + importedMediaItems[
+                                index1
+                            ].clips[index2]
+                            .duration * 10 * scale
+                            / 2 + 5,
+                        y: 10
+                    )
+                }
+
+            }
+        }
+    }
+}
+
+
