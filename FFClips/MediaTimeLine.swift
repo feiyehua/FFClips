@@ -54,9 +54,24 @@ struct MediaTimelineView: View {
     @State private var currentTime: Double = 0
     @State private var scale: CGFloat = 1.0
     @State private var scrollOffset: CGFloat = 0
-    @State private var clips: [Clip] = [
-        Clip(position: 10, duration: 5),
-        Clip(position: 30, duration: 8),
+    @State private var importedMediaItems: [ImportedMediaItem] = [
+        ImportedMediaItem(
+            url: URL(
+                string:
+                    "file:///Users/xiong/Downloads/ba085852d2a8a349b6a51fcbfc84bdb6.mp4"
+            )!,
+            type: .video,
+            clips: [Clip(position: 10, start: 0, duration: 5)]
+        ),
+        ImportedMediaItem(
+            url: URL(
+                string:
+                    "file:///Users/xiong/Downloads/ba085852d2a8a349b6a51fcbfc84bdb6.mp4"
+            )!,
+            type: .video,
+            clips: [Clip(position: 30, start: 0, duration: 8)]
+        ),
+
     ]
     @State private var loc: CGFloat?
     @State private var xloc: CGFloat = 0
@@ -67,16 +82,29 @@ struct MediaTimelineView: View {
     private func timeString(_ time: Double) -> String {
         let minutes = Int(time) / 60
         let seconds = Int(time) % 60
-        return String(format: "%02d:%02d", minutes, seconds)
+        let miliseconds=Int(time*1000)-(minutes*60+seconds)*1000
+        return String(format: "%02d:%02d:%03d", minutes, seconds,miliseconds)
     }
 
     var body: some View {
         VStack {
-            Text(timeString(currentTime))
-                .font(.headline)
+            ZStack {
+                Text(timeString(currentTime))
+                    .font(.headline)
+                    .padding()
+                    .frame(height: 50)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                Button(action: {
+                    print("hello")
+                }) {
+                    Image(systemName: "scissors")
+                }
+                .frame(maxWidth: .infinity, alignment: .trailing)
                 .padding()
-                .frame(height: 50)
-            ZStack{
+            }
+            .frame(maxWidth: .infinity)
+
+            ZStack {
                 GeometryReader { proxy in
                     ZStack {
                         VStack {
@@ -86,10 +114,11 @@ struct MediaTimelineView: View {
                                         Rectangle()
                                             .frame(
                                                 width: 1,
-                                                height: second % 5 == 0 ? 20 : 10
+                                                height: second % 5 == 0
+                                                    ? 20 : 10
                                             )
                                             .foregroundColor(.gray)
-                                        
+
                                         if second % 5 == 0 {
                                             Text("\(second)")
                                                 .font(.system(size: 6))
@@ -102,43 +131,50 @@ struct MediaTimelineView: View {
                             .padding()
                             ScrollView(.vertical) {
                                 VStack(spacing: 20) {
-                                    ForEach(clips) { clip in
-                                        //                                Text("hello")
-                                        RoundedRectangle(cornerRadius: 3)
-                                            .fill(.blue)
-                                            .frame(
-                                                width: clip.duration * 10 * scale,
-                                                height: 10
-                                            )
-                                            .position(
-                                                x: clip.position * 10 * scale + clip
-                                                    .duration * 10 * scale / 2 + 5,
-                                                y: 5
-                                            )
+                                    ForEach(importedMediaItems) { item in
+                                        ForEach(item.clips) { clip in
+                                            RoundedRectangle(cornerRadius: 3)
+                                                .fill(.blue)
+                                                .frame(
+                                                    width: clip.duration * 10
+                                                        * scale,
+                                                    height: 10
+                                                )
+                                                .position(
+                                                    x: clip.position * 10
+                                                        * scale + clip
+                                                        .duration * 10 * scale
+                                                        / 2 + 5,
+                                                    y: 5
+                                                )
+                                        }
+
                                     }
                                 }
                             }
-                            .frame(height: proxy.size.height-50)
-                            
+                            .frame(height: proxy.size.height - 50)
+
                         }
                         .position(
                             x: xloc + totalDuration * 10 * 0.5 * scale + 0.5
-                            * proxy.size.width - 5,
-                            y: proxy.size.height/2
+                                * proxy.size.width - 5,
+                            y: proxy.size.height / 2
                         )
                         .gesture(
                             DragGesture()
                                 .onChanged { value in
                                     xloc =
-                                    xloc
-                                    + (value.location.x - value.startLocation.x)
-                                    * 0.15 * scale
+                                        xloc
+                                        + (value.location.x
+                                            - value.startLocation.x)
+                                        * 0.1 * scale
                                     if xloc < -totalDuration * 10 * scale {
                                         xloc = -totalDuration * 10 * scale
                                     }
                                     if xloc > 0 {
                                         xloc = 0
                                     }
+                                    currentTime = -xloc / 10 / scale
                                 }
                         )
                     }
@@ -146,7 +182,7 @@ struct MediaTimelineView: View {
                         width: totalDuration * 10,
                         alignment: .center
                     )
-                    
+
                 }
                 ZStack {
                     // 固定播放头
@@ -161,7 +197,7 @@ struct MediaTimelineView: View {
                     }
                 }
             }
-            
+
         }
     }
 }
@@ -218,17 +254,28 @@ struct ControlPanel: View {
     }
 }
 
-// MARK: - 数据模型
-struct Clip: Identifiable {
-    let id = UUID()
-    var position: Double  // 起始时间（秒）
-    var duration: Double  // 持续时间（秒）
-}
-
 // MARK: - 预览
 struct TimelineView_Previews: PreviewProvider {
     static var previews: some View {
         MediaTimelineView()
             .frame(height: 200)
     }
+}
+
+struct ImportedMediaItem: Identifiable {
+    let id = UUID()
+    let url: URL
+    let type: MediaType
+    var clips: [Clip]
+    enum MediaType {
+        case image, video, audio
+    }
+}
+
+// MARK: - 数据模型
+struct Clip: Identifiable {
+    let id = UUID()
+    var position: Double  // 在时间线中的起始时间（秒）
+    var start: Double  //在原视频中的起始时间
+    var duration: Double  // 持续时间（秒）
 }
