@@ -20,25 +20,7 @@ struct MediaTimelineView: View {
     @State private var currentTime: Double = 0
     @State private var scale: CGFloat = 1.0
     @State private var scrollOffset: CGFloat = 0
-    @State private var importedMediaItems: [ImportedMediaItem] = [
-        ImportedMediaItem(
-            url: URL(
-                string:
-                    "file:///Users/xiong/Downloads/ba085852d2a8a349b6a51fcbfc84bdb6.mp4"
-            )!,
-            type: .video,
-            clips: [Clip(position: 10, start: 0, duration: 5)]
-        ),
-        ImportedMediaItem(
-            url: URL(
-                string:
-                    "file:///Users/xiong/Downloads/ba085852d2a8a349b6a51fcbfc84bdb6.mp4"
-            )!,
-            type: .video,
-            clips: [Clip(position: 30, start: 0, duration: 8)]
-        ),
-
-    ]
+    @Binding var importedMediaItems: [ImportedMediaItem]
     @State private var xloc: CGFloat = 0
 
     private let playheadWidth: CGFloat = 2
@@ -116,11 +98,30 @@ struct MediaTimelineView: View {
 }
 
 // MARK: - 预览
-struct TimelineView_Previews: PreviewProvider {
-    static var previews: some View {
-        MediaTimelineView()
+#Preview {
+    @Previewable @State var importedMediaItems: [ImportedMediaItem] = [
+        ImportedMediaItem(
+            url: URL(
+                string:
+                    "file:///Users/xiong/Downloads/ba085852d2a8a349b6a51fcbfc84bdb6.mp4"
+            )!,
+            type: .video,
+            clips: [Clip(position: 10, start: 0, duration: 5)]
+        ),
+        ImportedMediaItem(
+            url: URL(
+                string:
+                    "file:///Users/xiong/Downloads/ba085852d2a8a349b6a51fcbfc84bdb6.mp4"
+            )!,
+            type: .video,
+            clips: [Clip(position: 30, start: 0, duration: 8)]
+        ),
+
+    ]
+//    static var previews: some View {
+        MediaTimelineView(importedMediaItems:$importedMediaItems)
             .frame(height: 200)
-    }
+//    }
 }
 
 struct ImportedMediaItem: Identifiable {
@@ -128,9 +129,6 @@ struct ImportedMediaItem: Identifiable {
     let url: URL
     let type: MediaType
     var clips: [Clip]
-    enum MediaType {
-        case image, video, audio
-    }
 }
 
 // MARK: - 数据模型

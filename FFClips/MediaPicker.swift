@@ -16,15 +16,17 @@ import PhotosUI
 import SwiftUI
 import UniformTypeIdentifiers
 
-struct MediaItem: Identifiable {
+enum MediaType {
+    case image, video, audio
+}
+
+struct MediaItem: Identifiable, Equatable {
     let id = UUID()
     let thumbnail: UIImage
     let url: URL
     let type: MediaType
+    let duration: Double
 
-    enum MediaType {
-        case image, video
-    }
 }
 
 struct MediaPickerView: View {
@@ -84,7 +86,8 @@ struct MediaPickerView: View {
                 let mediaItem = MediaItem(
                     thumbnail: image,
                     url: url,
-                    type: .image
+                    type: .image,
+                    duration: 10.0
                 )
                 DispatchQueue.main.async {
                     mediaItems.append(mediaItem)
@@ -109,7 +112,8 @@ struct MediaPickerView: View {
             let mediaItem = MediaItem(
                 thumbnail: thumbnail,
                 url: url,
-                type: .video
+                type: .video,
+                duration: asset.duration.seconds
             )
             DispatchQueue.main.async {
                 mediaItems.append(mediaItem)
@@ -122,7 +126,6 @@ struct MediaPickerView: View {
     enum PickerType {
         case photoLibrary, files
     }
-
 
     var body: some View {
         NavigationView {
@@ -144,6 +147,11 @@ struct MediaPickerView: View {
                                     )
                                 )
 
+                            case .audio:
+                                Image(systemName: "waveform")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .padding()
                             }
                         } else {
                             VStack {
@@ -156,7 +164,10 @@ struct MediaPickerView: View {
                         }
                     }
                     .frame(height: proxy.size.height / 3)
-                    MediaLibrary(mediaItems:$mediaItems,selectedItem:$selectedItem)
+                    MediaLibrary(
+                        mediaItems: $mediaItems,
+                        selectedItem: $selectedItem
+                    )
                     .navigationTitle("Media Gallery")
                     .toolbar(content: {
                         ToolbarItem(placement: .topBarLeading) {
@@ -183,7 +194,14 @@ struct MediaPickerView: View {
                             }
                         }
                         ToolbarItem(placement: .topBarTrailing) {
-                            Image(systemName: "square.and.arrow.up")
+                            NavigationLink(
+                                destination: MediaEditView(
+                                    mediaItems: $mediaItems
+                                )
+                            ) {
+                                Image(systemName: "checkmark.square")
+                            }
+
                         }
                     })
                 }
