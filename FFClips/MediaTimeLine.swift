@@ -12,40 +12,6 @@
 //    ********************************************************************************/
 //
 //
-//import SwiftUI
-//
-//struct MediaTimeLine: View {
-//    @State private var totalTime=60.0
-//    @Binding var addedMediaItems:[MediaItem]
-//    var body: some View {
-////        ScrollView(.horizontal)
-////        {
-//            GeometryReader { proxy in
-//                VStack
-//                {
-////                    HStack{
-//////                        for i in stride(from:0.0,to:totalTime,by:1.0)
-//////                        {
-//////                            Rectangle()
-//////                                .color(.black)
-//////                        }
-////                    }
-//                    ForEach(addedMediaItems){item in
-//                        Rectangle()
-//                            .fill(.blue)
-//                            .frame(width: 12.0/totalTime*proxy.size.width)
-//                            .cornerRadius(5)
-//                    }
-//                }
-//            }
-////        }
-//
-//    }
-//}
-//
-//#Preview {
-////    MediaTimeLine()
-//}
 
 import SwiftUI
 
@@ -79,30 +45,12 @@ struct MediaTimelineView: View {
     private let playheadWidth: CGFloat = 2
     private let timelineHeight: CGFloat = 80
 
-    private func timeString(_ time: Double) -> String {
-        let minutes = Int(time) / 60
-        let seconds = Int(time) % 60
-        let miliseconds = Int(time * 1000) - (minutes * 60 + seconds) * 1000
-        return String(format: "%02d:%02d:%03d", minutes, seconds, miliseconds)
-    }
-
     var body: some View {
         VStack {
-            ZStack {
-                Text(timeString(currentTime))
-                    .font(.headline)
-                    .padding()
-                    .frame(height: 50)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                Button(action: {
-                    print("hello")
-                }) {
-                    Image(systemName: "scissors")
-                }
-                .frame(maxWidth: .infinity, alignment: .trailing)
-                .padding()
-            }
-            .frame(maxWidth: .infinity)
+            MediaTimeLineToolBar(
+                importedMediaItems: $importedMediaItems,
+                currentTime: $currentTime
+            )
 
             ZStack {
                 GeometryReader { proxy in
@@ -166,15 +114,15 @@ struct MediaTimelineView: View {
 
                 }
                 // 固定播放头
-//                VStack {
-                    Rectangle()
-                        .frame(
-                            width: playheadWidth
-                        )
-                        .frame(maxHeight: .infinity)
-                        .foregroundColor(.red)
-//                    Spacer()
-//                }
+                //                VStack {
+                Rectangle()
+                    .frame(
+                        width: playheadWidth
+                    )
+                    .frame(maxHeight: .infinity)
+                    .foregroundColor(.red)
+                //                    Spacer()
+                //                }
             }
         }
 
@@ -322,4 +270,46 @@ struct MediaTimeLineClips: View {
     }
 }
 
+struct MediaTimeLineToolBar: View {
+    @Binding var importedMediaItems: [ImportedMediaItem]
+    @Binding var currentTime: Double
 
+    private func timeString(_ time: Double) -> String {
+        let minutes = Int(time) / 60
+        let seconds = Int(time) % 60
+        let miliseconds = Int(time * 1000) - (minutes * 60 + seconds) * 1000
+        return String(format: "%02d:%02d:%03d", minutes, seconds, miliseconds)
+    }
+    
+    private func removeSelected() {
+        importedMediaItems.indices.forEach { index in
+                importedMediaItems[index].clips.removeAll { $0.isSelected }
+            }
+    }
+    
+    var body: some View {
+        ZStack {
+            Text(timeString(currentTime))
+                .font(.headline)
+                .padding()
+                .frame(height: 50)
+                .frame(maxWidth: .infinity, alignment: .center)
+            HStack {
+                Button(action: {
+                    removeSelected()
+                }) {
+                    Image(systemName: "trash")
+                        .foregroundStyle(Color.red)
+                }
+                Button(action: {
+                    print("hello")
+                }) {
+                    Image(systemName: "scissors")
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
+            .padding()
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
