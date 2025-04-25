@@ -39,7 +39,6 @@ struct MediaTimelineView: View {
         ),
 
     ]
-    @State private var loc: CGFloat?
     @State private var xloc: CGFloat = 0
 
     private let playheadWidth: CGFloat = 2
@@ -56,26 +55,10 @@ struct MediaTimelineView: View {
                 GeometryReader { proxy in
                     ZStack {
                         VStack {
-                            HStack(spacing: 0) {
-                                ForEach(0..<Int(totalDuration)) { second in
-                                    VStack(spacing: 2) {
-                                        Rectangle()
-                                            .frame(
-                                                width: 1,
-                                                height: second % 5 == 0
-                                                    ? 20 : 10
-                                            )
-                                            .foregroundColor(.gray)
-
-                                        if second % 5 == 0 {
-                                            Text("\(second)")
-                                                .font(.system(size: 6))
-                                                .foregroundColor(.gray)
-                                        }
-                                    }
-                                    .frame(width: 10 * scale)
-                                }
-                            }
+                            TimeLineRulerView(
+                                totalDuration: $totalDuration,
+                                scale: $scale
+                            )
                             ScrollView(.vertical) {
                                 MediaTimeLineClips(
                                     importedMediaItems: $importedMediaItems,
@@ -106,6 +89,12 @@ struct MediaTimelineView: View {
                                     currentTime = -xloc / 10 / scale
                                 }
                         )
+                        //                        .gesture(
+                        //                            MagnificationGesture()
+                        //                                .onChanged { value in
+                        //                                    scale = value.magnitude
+                        //                                }
+                        //                        )
                     }
                     .frame(
                         width: totalDuration * 10,
@@ -114,70 +103,15 @@ struct MediaTimelineView: View {
 
                 }
                 // 固定播放头
-                //                VStack {
                 Rectangle()
                     .frame(
                         width: playheadWidth
                     )
                     .frame(maxHeight: .infinity)
                     .foregroundColor(.red)
-                //                    Spacer()
-                //                }
             }
         }
 
-    }
-}
-
-// MARK: - 视频片段组件
-struct ClipView: View {
-    let clip: Clip
-    @Binding var scale: CGFloat
-    let totalDuration: Double
-
-    var body: some View {
-        HStack(spacing: 0) {
-            RoundedRectangle(cornerRadius: 4)
-                .fill(Color.blue)
-                .frame(
-                    width: CGFloat(clip.duration) * 50 * scale,
-                    height: 40
-                )
-                .overlay(
-                    Text("Clip \(clip.id)")
-                        .font(.caption)
-                        .foregroundColor(.white)
-                )
-                .offset(x: CGFloat(clip.position) * 50 * scale)
-        }
-        .contentShape(Rectangle())
-        .gesture(
-            DragGesture()
-                .onChanged { value in
-                    // 实现片段拖拽逻辑
-                }
-        )
-    }
-}
-
-// MARK: - 控制面板
-struct ControlPanel: View {
-    @Binding var currentTime: Double
-    @Binding var scale: CGFloat
-    let totalDuration: Double
-
-    var body: some View {
-        VStack {
-            Slider(value: $currentTime, in: 0...totalDuration)
-                .padding(.horizontal)
-
-            HStack {
-                Text("缩放: \(scale, specifier: "%.1f")x")
-                Slider(value: $scale, in: 0.5...3.0)
-                    .frame(width: 200)
-            }
-            .padding()
-        }
     }
 }
 
@@ -280,13 +214,13 @@ struct MediaTimeLineToolBar: View {
         let miliseconds = Int(time * 1000) - (minutes * 60 + seconds) * 1000
         return String(format: "%02d:%02d:%03d", minutes, seconds, miliseconds)
     }
-    
+
     private func removeSelected() {
         importedMediaItems.indices.forEach { index in
-                importedMediaItems[index].clips.removeAll { $0.isSelected }
-            }
+            importedMediaItems[index].clips.removeAll { $0.isSelected }
+        }
     }
-    
+
     var body: some View {
         ZStack {
             Text(timeString(currentTime))
@@ -311,5 +245,33 @@ struct MediaTimeLineToolBar: View {
             .padding()
         }
         .frame(maxWidth: .infinity)
+    }
+}
+
+struct TimeLineRulerView: View {
+    @Binding var totalDuration: Double
+    @Binding var scale: CGFloat
+
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(0..<Int(totalDuration)) { second in
+                VStack(spacing: 2) {
+                    Rectangle()
+                        .frame(
+                            width: 1,
+                            height: second % 5 == 0
+                                ? 20 : 10
+                        )
+                        .foregroundColor(.gray)
+
+                    if second % 5 == 0 {
+                        Text("\(second)")
+                            .font(.system(size: 6))
+                            .foregroundColor(.gray)
+                    }
+                }
+                .frame(width: 10 * scale)
+            }
+        }
     }
 }
