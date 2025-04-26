@@ -42,7 +42,6 @@ struct MediaLibrary: View {
                     )
                     .onTapGesture(perform: {
                         selectedItem = item
-                        print("b")
                     })
             }
         }

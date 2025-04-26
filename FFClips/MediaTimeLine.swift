@@ -17,7 +17,7 @@ import SwiftUI
 
 struct MediaTimelineView: View {
     @State private var totalDuration: Double = 60
-    @State private var currentTime: Double = 0
+    @Binding var currentTime: Double
     @State private var scale: CGFloat = 1.0
     @State private var scrollOffset: CGFloat = 0
     @Binding var importedMediaItems: [ImportedMediaItem]
@@ -44,7 +44,8 @@ struct MediaTimelineView: View {
                             ScrollView(.vertical) {
                                 MediaTimeLineClips(
                                     importedMediaItems: $importedMediaItems,
-                                    scale: $scale
+                                    scale: $scale,
+                                    totalDuration: $totalDuration
                                 )
                             }
 
@@ -118,10 +119,14 @@ struct MediaTimelineView: View {
         ),
 
     ]
-//    static var previews: some View {
-        MediaTimelineView(importedMediaItems:$importedMediaItems)
-            .frame(height: 200)
-//    }
+    @Previewable @State var currentTime: Double = 0
+    //    static var previews: some View {
+    MediaTimelineView(
+        currentTime: $currentTime,
+        importedMediaItems: $importedMediaItems
+    )
+    .frame(height: 200)
+    //    }
 }
 
 struct ImportedMediaItem: Identifiable {
@@ -143,6 +148,8 @@ struct Clip: Identifiable {
 struct MediaTimeLineClips: View {
     @Binding var importedMediaItems: [ImportedMediaItem]
     @Binding var scale: CGFloat
+    @Binding var totalDuration: Double
+
     let rounderRectangleCornerSize: CGFloat = 5
 
     var body: some View {
@@ -166,6 +173,42 @@ struct MediaTimeLineClips: View {
                                 .clips[index2]
                                 .isSelected.toggle()
                         })
+                        .gesture(
+                            DragGesture()
+                                .onChanged {
+                                    value in
+                                    if importedMediaItems[index1].clips[index2]
+                                        .isSelected
+                                    {
+                                        importedMediaItems[index1].clips[index2]
+                                            .position =
+                                            importedMediaItems[index1].clips[
+                                                index2
+                                            ].position
+                                            + (value.location.x
+                                                - value.startLocation.x) * 0.1
+                                            * scale
+                                        if importedMediaItems[index1].clips[
+                                            index2
+                                        ].position < 0 {
+                                            importedMediaItems[index1].clips[
+                                                index2
+                                            ].position = 0
+                                        } else if importedMediaItems[index1]
+                                            .clips[index2].position
+                                            + importedMediaItems[index1]
+                                            .clips[index2].duration
+                                            + 5 > totalDuration
+                                        {
+                                            totalDuration =
+                                                importedMediaItems[index1]
+                                                .clips[index2].position
+                                                + importedMediaItems[index1]
+                                                .clips[index2].duration + 5
+                                        }
+                                    }
+                                }
+                        )
                         if importedMediaItems[index1].clips[index2].isSelected {
                             RoundedRectangle(
                                 cornerRadius: rounderRectangleCornerSize
@@ -252,7 +295,7 @@ struct TimeLineRulerView: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            ForEach(0..<Int(totalDuration)) { second in
+            ForEach(0..<Int(totalDuration), id: \.self) { second in
                 VStack(spacing: 2) {
                     Rectangle()
                         .frame(
