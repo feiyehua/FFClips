@@ -151,7 +151,16 @@ struct MediaTimeLineClips: View {
     @Binding var totalDuration: Double
 
     let rounderRectangleCornerSize: CGFloat = 5
-
+    private func colorSetter(type:MediaType)->Color{
+        switch type{
+        case .video:
+            return .blue
+        case .image:
+            return .green
+        case .audio:
+            return .red
+        }
+    }
     var body: some View {
         VStack(spacing: 20) {
             ForEach(
@@ -167,7 +176,7 @@ struct MediaTimeLineClips: View {
                         RoundedRectangle(
                             cornerRadius: rounderRectangleCornerSize
                         )
-                        .fill(.blue)
+                        .fill(colorSetter(type: importedMediaItems[index1].type))
                         .onTapGesture(perform: {
                             importedMediaItems[index1]
                                 .clips[index2]

@@ -22,7 +22,17 @@ struct MediaEditView: View {
     var body: some View {
         GeometryReader { proxy in
             VStack {
-                MediaTimelineView(currentTime: $currentTime,importedMediaItems: $importedMediaItems)
+                NavigationLink(
+                    destination: MediaCompositionPreview(
+                        importedMediaItems: importedMediaItems
+                    )
+                ) {
+                    Image(systemName: "play")
+                }
+                MediaTimelineView(
+                    currentTime: $currentTime,
+                    importedMediaItems: $importedMediaItems
+                )
                 MediaLibrary(
                     mediaItems: $mediaItems,
                     selectedItem: $selectedItem
@@ -43,6 +53,21 @@ struct MediaEditView: View {
                             ]
                         )
                         importedMediaItems.append(_importedMediaItem)
+                        if selectedItem!.type == .video {
+                            let _importedMediaItem = ImportedMediaItem(
+                                url: selectedItem!.url,
+                                type: .audio,
+                                clips: [
+                                    Clip(
+                                        isSelected: false,
+                                        position: 0.0,
+                                        start: 0.0,
+                                        duration: selectedItem!.duration,
+                                    )
+                                ]
+                            )
+                            importedMediaItems.append(_importedMediaItem)
+                        }
                     }
                 )
                 .frame(height: proxy.size.height / 3)
