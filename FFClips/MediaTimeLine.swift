@@ -167,88 +167,90 @@ struct MediaTimeLineClips: View {
                 importedMediaItems.indices,
                 id: \.self
             ) { index1 in
-                ForEach(
-                    importedMediaItems[index1].clips
-                        .indices,
-                    id: \.self
-                ) { index2 in
-                    ZStack {
-                        RoundedRectangle(
-                            cornerRadius: rounderRectangleCornerSize
-                        )
-                        .fill(colorSetter(type: importedMediaItems[index1].type))
-                        .onTapGesture(perform: {
-                            importedMediaItems[index1]
-                                .clips[index2]
-                                .isSelected.toggle()
-                        })
-                        .gesture(
-                            DragGesture()
-                                .onChanged {
-                                    value in
-                                    if importedMediaItems[index1].clips[index2]
-                                        .isSelected
-                                    {
-                                        importedMediaItems[index1].clips[index2]
-                                            .position =
+                ZStack{
+                    ForEach(
+                        importedMediaItems[index1].clips
+                            .indices,
+                        id: \.self
+                    ) { index2 in
+                        ZStack {
+                            RoundedRectangle(
+                                cornerRadius: rounderRectangleCornerSize
+                            )
+                            .fill(colorSetter(type: importedMediaItems[index1].type))
+                            .onTapGesture(perform: {
+                                importedMediaItems[index1]
+                                    .clips[index2]
+                                    .isSelected.toggle()
+                            })
+                            .gesture(
+                                DragGesture()
+                                    .onChanged {
+                                        value in
+                                        if importedMediaItems[index1].clips[index2]
+                                            .isSelected
+                                        {
+                                            importedMediaItems[index1].clips[index2]
+                                                .position =
                                             importedMediaItems[index1].clips[
                                                 index2
                                             ].position
                                             + (value.location.x
-                                                - value.startLocation.x) * 0.1
+                                               - value.startLocation.x) * 0.1
                                             * scale
-                                        if importedMediaItems[index1].clips[
-                                            index2
-                                        ].position < 0 {
-                                            importedMediaItems[index1].clips[
+                                            if importedMediaItems[index1].clips[
                                                 index2
-                                            ].position = 0
-                                        } else if importedMediaItems[index1]
-                                            .clips[index2].position
-                                            + importedMediaItems[index1]
-                                            .clips[index2].duration
-                                            + 5 > totalDuration
-                                        {
-                                            totalDuration =
-                                                importedMediaItems[index1]
+                                            ].position < 0 {
+                                                importedMediaItems[index1].clips[
+                                                    index2
+                                                ].position = 0
+                                            } else if importedMediaItems[index1]
                                                 .clips[index2].position
+                                                        + importedMediaItems[index1]
+                                                .clips[index2].duration
+                                                        + 5 > totalDuration
+                                            {
+                                                totalDuration =
+                                                importedMediaItems[index1]
+                                                    .clips[index2].position
                                                 + importedMediaItems[index1]
-                                                .clips[index2].duration + 5
+                                                    .clips[index2].duration + 5
+                                            }
                                         }
                                     }
-                                }
-                        )
-                        if importedMediaItems[index1].clips[index2].isSelected {
-                            RoundedRectangle(
-                                cornerRadius: rounderRectangleCornerSize
                             )
-                            .strokeBorder(Color.black, lineWidth: 2)
-
+                            if importedMediaItems[index1].clips[index2].isSelected {
+                                RoundedRectangle(
+                                    cornerRadius: rounderRectangleCornerSize
+                                )
+                                .strokeBorder(Color.black, lineWidth: 2)
+                                
+                            }
                         }
-                    }
-                    .frame(
-                        width: importedMediaItems[
-                            index1
-                        ].clips[index2].duration
+                        .frame(
+                            width: importedMediaItems[
+                                index1
+                            ].clips[index2].duration
                             * 10
                             * scale,
-                        height: 20
-                    )
-                    .position(
-                        x: importedMediaItems[
-                            index1
-                        ].clips[index2].position
+                            height: 20
+                        )
+                        .position(
+                            x: importedMediaItems[
+                                index1
+                            ].clips[index2].position
                             * 10
                             * scale
                             + importedMediaItems[
                                 index1
                             ].clips[index2]
-                            .duration * 10 * scale
+                                .duration * 10 * scale
                             / 2 + 5,
-                        y: 10
-                    )
+                            y: 10
+                        )
+                    }
                 }
-
+                .frame(maxWidth:.infinity)
             }
         }
     }
@@ -271,6 +273,25 @@ struct MediaTimeLineToolBar: View {
         }
     }
 
+    private func cutSelected(){
+        importedMediaItems.indices.forEach { index in
+            var newClips:[Clip]=[]
+            importedMediaItems[index].clips.indices.forEach{index2 in
+                let currentClip=importedMediaItems[index].clips[index2]
+                if(currentClip.isSelected == true && currentTime>currentClip.position && currentTime <= currentClip.position + currentClip.duration)
+                {
+                    
+                    newClips.append(Clip(position: currentClip.position, start: currentClip.start, duration: currentTime-currentClip.position))
+                    newClips.append(Clip(position: currentTime, start: currentClip.start+currentTime-currentClip.position, duration: currentClip.duration-(currentTime-currentClip.position)))
+                }
+                else{
+                    newClips.append(currentClip)
+                }
+            }
+            importedMediaItems[index].clips=newClips
+        }
+    }
+    
     var body: some View {
         ZStack {
             Text(timeString(currentTime))
@@ -286,7 +307,7 @@ struct MediaTimeLineToolBar: View {
                         .foregroundStyle(Color.red)
                 }
                 Button(action: {
-                    print("hello")
+                    cutSelected()
                 }) {
                     Image(systemName: "scissors")
                 }

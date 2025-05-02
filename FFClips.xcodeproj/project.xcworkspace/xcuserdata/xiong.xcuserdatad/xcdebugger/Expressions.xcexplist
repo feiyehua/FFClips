@@ -3,14 +3,6 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "closure #1 in closure #3 in MediaPickerView.body.getter:MediaItem.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "mediaItems">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
          contextName = "closure #2 in closure #1 in closure #1 in closure #1 in closure #1 in MediaTimeLineClips.body.getter:MediaTimeLine.swift">
          <PersistentStrings>
             <PersistentString
@@ -23,6 +15,25 @@
          <PersistentStrings>
             <PersistentString
                value = "loc">
+            </PersistentString>
+            <PersistentString
+               value = "importedMediaItems">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in MediaTimeLineToolBar.cutSelected():MediaTimeLine.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "currentClip">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #3 in MediaPickerView.body.getter:MediaItem.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "mediaItems">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
